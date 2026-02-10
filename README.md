@@ -16,7 +16,7 @@ docker-compose up -d
 docker exec -i coghealth-postgres psql -U coghealth coghealth < seed.sql
 cd ..
 
-# 3. Start API (Java 17 required)
+# 3. Start API (Java 21 required)
 cd api
 ./start.sh   # Select 1 for local PostgreSQL
 cd ..
@@ -40,7 +40,7 @@ Open http://localhost:5173
 ## Prerequisites
 
 - Docker Desktop
-- Java 17 (`brew install openjdk@17`)
+- Java 21 (`brew install openjdk@21`)
 - Node.js 18+ (`brew install node`)
 - Maven (`brew install maven`)
 
