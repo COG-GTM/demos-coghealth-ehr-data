@@ -2,26 +2,25 @@
 
 Electronic Health Record System - Demo Application
 
-## Quick Start
+## Quick Start (Neon Cloud DB — no Docker needed)
 
 ```bash
 # 1. Clone all repos
-git clone git@github.com:cogdeasy/demos-coghealth-ehr-data.git data
-git clone git@github.com:cogdeasy/demos-coghealth-ehr-api.git api
-git clone git@github.com:cogdeasy/demos-coghealth-ehr-web.git web
+git clone git@github.com:COG-GTM/demos-coghealth-ehr-data.git data
+git clone git@github.com:COG-GTM/demos-coghealth-ehr-api.git api
+git clone git@github.com:COG-GTM/demos-coghealth-ehr-web.git web
 
-# 2. Start infrastructure (Docker required)
-cd data
-docker-compose up -d
-docker exec -i coghealth-postgres psql -U coghealth coghealth < seed.sql
-cd ..
-
-# 3. Start API (Java 17 required)
+# 2. Start API (Java 11 required)
 cd api
-./start.sh   # Select 1 for local PostgreSQL
+export JAVA_HOME=/opt/homebrew/opt/openjdk@11
+export PATH="$JAVA_HOME/bin:$PATH"
+export NEON_DB_URL="jdbc:postgresql://<neon-host>/neondb?sslmode=require"
+export NEON_DB_USERNAME="<username>"
+export NEON_DB_PASSWORD="<password>"
+mvn spring-boot:run -Dspring-boot.run.profiles=dev
 cd ..
 
-# 4. Start Web (Node 18+ required)
+# 3. Start Web (Node.js 20.19+ or 22.12+ required)
 cd web
 npm install
 npm run dev
@@ -29,34 +28,53 @@ npm run dev
 
 Open http://localhost:5173
 
+Get Neon credentials from your team lead or `.env` file.
+
+### Quick Start (Local Docker)
+
+```bash
+# 1. Start infrastructure (Docker required)
+cd data
+docker-compose up -d
+docker exec -i coghealth-postgres psql -U coghealth coghealth < seed.sql
+cd ..
+
+# 2. Start API
+cd api
+mvn spring-boot:run
+cd ..
+
+# 3. Start Web
+cd web
+npm install
+npm run dev
+```
+
 ## Repositories
 
 | Repo | Description | Port |
 |------|-------------|------|
-| [data](https://github.com/cogdeasy/demos-coghealth-ehr-data) (this repo) | Docker infrastructure (PostgreSQL, Redis, Keycloak) | 5432, 6379, 8180 |
-| [api](https://github.com/cogdeasy/demos-coghealth-ehr-api) | Spring Boot REST API | 8080 |
-| [web](https://github.com/cogdeasy/demos-coghealth-ehr-web) | React frontend | 5173 |
+| [data](https://github.com/COG-GTM/demos-coghealth-ehr-data) (this repo) | Docker infrastructure (PostgreSQL, Redis, Keycloak) | 5432, 6379, 8180 |
+| [api](https://github.com/COG-GTM/demos-coghealth-ehr-api) | Spring Boot REST API | 8080 |
+| [web](https://github.com/COG-GTM/demos-coghealth-ehr-web) | React frontend | 5173 |
 
 ## Prerequisites
 
-- Docker Desktop
-- Java 17 (`brew install openjdk@17`)
-- Node.js 18+ (`brew install node`)
+**For Neon (cloud DB):**
+- Java 11 (`brew install openjdk@11`)
+- Node.js 20.19+ or 22.12+ (`nvm install 22`)
 - Maven (`brew install maven`)
+
+**For local Docker:**
+- All of the above, plus Docker Desktop
 
 ## Architecture
 
 ```
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
 │   React     │────▶│  Spring     │────▶│ PostgreSQL  │
-│   :5173     │     │  Boot :8080 │     │   :5432     │
+│   :5173     │     │  Boot :8080 │     │ (Neon/local)│
 └─────────────┘     └─────────────┘     └─────────────┘
-                           │
-                           ▼
-                    ┌─────────────┐
-                    │   Redis     │
-                    │   :6379     │
-                    └─────────────┘
 ```
 
 ## Demo Users
@@ -101,15 +119,9 @@ All users have password: `demo123`
 
 ## Database Options
 
-**Local (default):** Uses Docker PostgreSQL with seed data.
+**Neon (cloud — recommended):** No Docker needed. Uses a shared cloud PostgreSQL instance with pre-seeded data. See Quick Start above.
 
-**Neon (cloud):** Set environment variables and run with dev profile:
-```bash
-export NEON_DB_URL=jdbc:postgresql://your-endpoint.neon.tech/neondb?sslmode=require
-export NEON_DB_USERNAME=your-username
-export NEON_DB_PASSWORD=your-password
-cd api && ./start.sh  # Select 2 for Neon
-```
+**Local (Docker):** Uses Docker PostgreSQL with seed data. Requires Docker Desktop. See Local Docker section above.
 
 ## Commands
 
