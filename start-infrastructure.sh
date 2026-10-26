@@ -86,7 +86,7 @@ echo " ✅"
 
 # Wait for RabbitMQ
 echo -n "  RabbitMQ: "
-until curl -sf -u "$RABBITMQ_USER:$RABBITMQ_PASSWORD" http://127.0.0.1:15672/api/overview > /dev/null 2>&1; do
+until curl -sf -u "${RABBITMQ_USER:-coghealth}:$RABBITMQ_PASSWORD" http://127.0.0.1:15672/api/overview > /dev/null 2>&1; do
     echo -n "."
     sleep 3
 done
