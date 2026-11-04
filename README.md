@@ -134,3 +134,5 @@ docker-compose logs -f    # View logs
 ## License
 
 Demo Application - Cognition AI
+
+<!-- Test PR from Devin: harmless README comment, safe to close. -->
