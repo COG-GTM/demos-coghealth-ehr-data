@@ -1,0 +1,17 @@
+name: JDK version check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  java4shell:
+    name: Runtime JDKs are patched for Java4Shell (CVE-2026-114938)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Self-test version logic
+        run: scripts/check-jdk-versions.sh --self-test
+      - name: Check JDKs bundled in docker-compose images
+        run: scripts/check-jdk-versions.sh
