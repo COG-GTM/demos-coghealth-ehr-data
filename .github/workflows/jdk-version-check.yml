@@ -1,0 +1,31 @@
+name: JDK version check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  java4shell:
+    name: Runtime JDKs are patched for Java4Shell (CVE-2026-114938)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Self-test version logic
+        run: scripts/check-jdk-versions.sh --self-test
+      - name: Check JDKs bundled in docker-compose images
+        run: scripts/check-jdk-versions.sh
+      - name: Realm keeps the sub claim on Keycloak 26 (basic scope)
+        run: |
+          python3 - <<'PY'
+          import json
+          realm = json.load(open("docker/keycloak/coghealth-realm.json"))
+          scopes = {s["name"]: s for s in realm.get("clientScopes", [])}
+          mappers = [m["protocolMapper"] for m in scopes.get("basic", {}).get("protocolMappers", [])]
+          assert "oidc-sub-mapper" in mappers, "realm must define a 'basic' client scope with oidc-sub-mapper"
+          assert "basic" in realm.get("defaultDefaultClientScopes", []), "'basic' must be a realm default client scope"
+          for c in realm["clients"]:
+              if "defaultClientScopes" in c:
+                  assert "basic" in c["defaultClientScopes"], f"{c['clientId']} must list 'basic' in defaultClientScopes"
+          print("realm sub-claim check passed")
+          PY
