@@ -193,6 +193,7 @@
         "http://localhost:3000"
       ],
       "defaultClientScopes": [
+        "basic",
         "web-origins",
         "profile",
         "roles",
@@ -200,7 +201,29 @@
       ]
     }
   ],
+  "defaultDefaultClientScopes": ["basic"],
   "clientScopes": [
+    {
+      "name": "basic",
+      "description": "OpenID Connect scope for adding all basic claims to the token",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "false",
+        "display.on.consent.screen": "false"
+      },
+      "protocolMappers": [
+        {
+          "name": "sub",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-sub-mapper",
+          "consentRequired": false,
+          "config": {
+            "access.token.claim": "true",
+            "introspection.token.claim": "true"
+          }
+        }
+      ]
+    },
     {
       "name": "coghealth-scope",
       "protocol": "openid-connect",
